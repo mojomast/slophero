@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="theme-color" content="#0a0a0a" />
+    
+    <!-- Primary Meta Tags -->
+    <title>ROO GANG - Infra Extraction Horror</title>
+    <meta name="title" content="ROO GANG - Infra Extraction Horror" />
+    <meta name="description" content="Keep the stack alive. Get the man out. Manage six stats. Make brutal choices. Survive celebrity chaos. Can you extract? Or will you drop the line?" />
+    <meta name="keywords" content="game, narrative, horror, ops, extraction, crypto, startup, burnout" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ROO GANG - Infra Extraction Horror" />
+    <meta property="og:description" content="Get AiSatoshi out of China before the heat catches up. Survive celebrity chaos. 7 endings. 25+ random encounters. Infinite ways to collapse." />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="ROO GANG - Infra Extraction Horror" />
+    <meta property="twitter:description" content="Keep the stack alive. Get the man out. Can you extract? Or will you drop the line?" />
+    
+    <!-- PWA / Mobile -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ROO GANG" />
+    
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Splash Screen -->
+      <div id="splash" class="splash">
+        <div class="splash-content">
+          <h1 class="title">ROO GANG</h1>
+          <p class="tagline">INFRA EXTRACTION HORROR</p>
+          <button id="start-button" class="crt-button">BEGIN EXTRACTION</button>
+        </div>
+      </div>
+
+      <!-- War Room (Hidden initially) -->
+      <div id="war-room" class="war-room hidden">
+        <!-- Stat HUD (Top Left) -->
+        <div class="stat-hud">
+          <div class="stat-bar" id="energy-bar">
+            <span class="stat-label">ENERGY</span>
+            <div class="bar-container">
+              <div class="bar-fill" data-stat="energy"></div>
+            </div>
+            <span class="stat-value" data-stat="energy">100</span>
+          </div>
+          <div class="stat-bar" id="sanity-bar">
+            <span class="stat-label">SANITY</span>
+            <div class="bar-container">
+              <div class="bar-fill" data-stat="sanity"></div>
+            </div>
+            <span class="stat-value" data-stat="sanity">100</span>
+          </div>
+          <div class="stat-bar" id="heat-bar">
+            <span class="stat-label">HEAT</span>
+            <div class="bar-container">
+              <div class="bar-fill" data-stat="heat"></div>
+            </div>
+            <span class="stat-value" data-stat="heat">0</span>
+          </div>
+          <div class="stat-bar" id="tokens-bar">
+            <span class="stat-label">TOKENS</span>
+            <div class="bar-container">
+              <div class="bar-fill" data-stat="tokens"></div>
+            </div>
+            <span class="stat-value" data-stat="tokens">100</span>
+          </div>
+          <div class="stat-bar" id="hype-bar">
+            <span class="stat-label">HYPE</span>
+            <div class="bar-container">
+              <div class="bar-fill" data-stat="hype"></div>
+            </div>
+            <span class="stat-value" data-stat="hype">50</span>
+          </div>
+          <div class="stat-bar" id="cred-bar">
+            <span class="stat-label">CRED</span>
+            <div class="bar-container">
+              <div class="bar-fill" data-stat="cred"></div>
+            </div>
+            <span class="stat-value" data-stat="cred">50</span>
+          </div>
+        </div>
+
+        <!-- Extraction Readiness (Top Right) -->
+        <div class="extraction-readiness">
+          <div class="readiness-label">EXTRACTION READINESS</div>
+          <div class="readiness-meter">
+            <div class="readiness-fill" id="readiness-fill"></div>
+          </div>
+          <div class="readiness-value" id="readiness-value">0%</div>
+        </div>
+
+        <!-- Perk Buttons (Below Readiness) -->
+        <div class="perk-buttons">
+          <div class="perk-label">// CREW PERKS</div>
+          <button id="hubris-breather" class="perk-button" title="Hübris: Force a breather moment">
+            <span class="perk-name">BREATHER</span>
+            <span class="perk-char">[H]</span>
+          </button>
+          <button id="hubris-rtc" class="perk-button" title="Hübris: RTC THIS BITCH - Force Clean Trail operation">
+            <span class="perk-name">RTC THIS</span>
+            <span class="perk-char">[H]</span>
+          </button>
+          <button id="roo-brrr-override" class="perk-button" title="Roo: Skip ESCALATION, high reward but smashes Sanity">
+            <span class="perk-name">BRRR NOW</span>
+            <span class="perk-char">[R]</span>
+          </button>
+          <button id="satoshi-dark-favor" class="perk-button" title="AiSatoshi: Emergency Tokens (+50) but Heat spikes (+30)">
+            <span class="perk-name">DARK FAVOR</span>
+            <span class="perk-char">[S]</span>
+          </button>
+        </div>
+
+        <!-- Chat Window (Center Left) -->
+        <div class="chat-window">
+          <div class="chat-header">// CREW CHANNEL</div>
+          <div class="chat-messages" id="chat-messages"></div>
+        </div>
+
+        <!-- Terminal Log (Center Right) -->
+        <div class="terminal-window">
+          <div class="terminal-header">// SYSTEM LOG</div>
+          <div class="terminal-content" id="terminal-log"></div>
+        </div>
+
+        <!-- Codec Popup (Bottom) -->
+        <div class="codec-popup hidden" id="codec-popup">
+          <div class="codec-portrait" id="codec-portrait"></div>
+          <div class="codec-info">
+            <div class="codec-name" id="codec-name"></div>
+            <div class="codec-dialogue" id="codec-dialogue"></div>
+          </div>
+          <button class="codec-continue" id="codec-continue">CONTINUE</button>
+        </div>
+
+        <!-- Choice Menu (Overlays when active) -->
+        <div class="choice-menu hidden" id="choice-menu">
+          <div class="choice-header" id="choice-header">SELECT OPERATION</div>
+          <div class="choice-list" id="choice-list"></div>
+        </div>
+        
+        <!-- Ending Screen -->
+        <div class="ending-screen hidden" id="ending-screen">
+          <div class="ending-content">
+            <div class="ending-title" id="ending-title"></div>
+            <div class="ending-text" id="ending-text"></div>
+            <div class="ending-stats" id="ending-stats"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
