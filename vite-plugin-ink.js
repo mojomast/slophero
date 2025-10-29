@@ -1,7 +1,4 @@
-import { execSync } from 'child_process';
-import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { tmpdir } from 'os';
+import { readFileSync, existsSync } from 'fs';
 
 export default function inkPlugin() {
   return {
@@ -12,43 +9,20 @@ export default function inkPlugin() {
         // Remove ?raw suffix to get actual file path
         const filePath = id.split('?')[0];
         
-        // Create temp files for compilation
-        const tempInkPath = join(tmpdir(), `temp_${Date.now()}.ink`);
-        const tempJsonPath = tempInkPath.replace('.ink', '.json');
+        // Look for pre-compiled .json file
+        const jsonPath = filePath.replace('.ink', '.json');
+        
+        if (!existsSync(jsonPath)) {
+          this.error(
+            `Pre-compiled JSON not found: ${jsonPath}\n` +
+            'Run "node compile-ink.js" to compile Ink files before building.'
+          );
+          return;
+        }
         
         try {
-          // Read the source
-          const inkSource = readFileSync(filePath, 'utf-8');
-          
-          // Write to temp file
-          writeFileSync(tempInkPath, inkSource, 'utf-8');
-          
-          // Compile using inklecate (platform-specific binary)
-          const isWindows = process.platform === 'win32';
-          const inklecateBinary = isWindows ? 'inklecate.exe' : 'inklecate';
-          const inklecatePath = join(process.cwd(), 'node_modules', 'inklecate', 'bin', inklecateBinary);
-          
-          // On Linux/Mac, ensure the binary is executable
-          if (!isWindows) {
-            try {
-              execSync(`chmod +x "${inklecatePath}"`, { stdio: 'ignore' });
-            } catch (e) {
-              // Ignore chmod errors, might already be executable
-            }
-          }
-          
-          const compileOutput = execSync(`"${inklecatePath}" -o "${tempJsonPath}" "${tempInkPath}"`, {
-            encoding: 'utf-8',
-            stdio: ['ignore', 'pipe', 'pipe'],
-          });
-          
-          // Check if output file was created
-          if (!existsSync(tempJsonPath)) {
-            throw new Error(`Compilation failed. Output: ${compileOutput}`);
-          }
-          
-          // Read compiled JSON and strip BOM if present
-          let compiledJson = readFileSync(tempJsonPath, 'utf-8');
+          // Read pre-compiled JSON
+          let compiledJson = readFileSync(jsonPath, 'utf-8');
           
           // Remove BOM (Byte Order Mark) if present
           if (compiledJson.charCodeAt(0) === 0xFEFF) {
@@ -59,12 +33,8 @@ export default function inkPlugin() {
           try {
             JSON.parse(compiledJson);
           } catch (e) {
-            throw new Error(`Invalid JSON output: ${e.message}`);
+            throw new Error(`Invalid JSON in ${jsonPath}: ${e.message}`);
           }
-          
-          // Clean up temp files
-          unlinkSync(tempInkPath);
-          unlinkSync(tempJsonPath);
           
           // Return the compiled JSON as a JavaScript string
           // The Story constructor expects a JSON string, not an object
@@ -73,14 +43,8 @@ export default function inkPlugin() {
             map: null,
           };
         } catch (error) {
-          // Clean up on error
-          try {
-            unlinkSync(tempInkPath);
-            if (existsSync(tempJsonPath)) unlinkSync(tempJsonPath);
-          } catch {}
-          
-          console.error(`[vite-plugin-ink] Error compiling ${filePath}:`, error.message);
-          this.error(`Ink compilation error in ${id}:\n${error.message}\n${error.stack}`);
+          console.error(`[vite-plugin-ink] Error loading ${jsonPath}:`, error.message);
+          this.error(`Ink loading error in ${id}:\n${error.message}`);
           return;
         }
       }
