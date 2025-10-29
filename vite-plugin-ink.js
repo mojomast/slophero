@@ -23,8 +23,20 @@ export default function inkPlugin() {
           // Write to temp file
           writeFileSync(tempInkPath, inkSource, 'utf-8');
           
-          // Compile using inklecate
-          const inklecatePath = join(process.cwd(), 'node_modules', 'inklecate', 'bin', 'inklecate.exe');
+          // Compile using inklecate (platform-specific binary)
+          const isWindows = process.platform === 'win32';
+          const inklecateBinary = isWindows ? 'inklecate.exe' : 'inklecate';
+          const inklecatePath = join(process.cwd(), 'node_modules', 'inklecate', 'bin', inklecateBinary);
+          
+          // On Linux/Mac, ensure the binary is executable
+          if (!isWindows) {
+            try {
+              execSync(`chmod +x "${inklecatePath}"`, { stdio: 'ignore' });
+            } catch (e) {
+              // Ignore chmod errors, might already be executable
+            }
+          }
+          
           const compileOutput = execSync(`"${inklecatePath}" -o "${tempJsonPath}" "${tempInkPath}"`, {
             encoding: 'utf-8',
             stdio: ['ignore', 'pipe', 'pipe'],
